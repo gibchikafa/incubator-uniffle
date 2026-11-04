@@ -105,7 +105,7 @@ HADOOP_SHORT_VERSION=$(echo $HADOOP_VERSION | awk -F "." '{print $1"."$2}')
 
 if [ -z "$BASE_IMAGE" ]; then
   echo "start building base image: uniffle-base"
-  docker build -t "uniffle-base:latest" \
+  docker build --no-cache --pull -t "uniffle-base:latest" \
     -f base/"${OS_DISTRIBUTION}"/Dockerfile .
   BASE_IMAGE="uniffle-base:latest"
 else
