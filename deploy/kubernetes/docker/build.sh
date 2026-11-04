@@ -116,7 +116,7 @@ HADOOP_SHORT_VERSION=${HADOOP_PROFILE#hadoop}
 
 if [ -z "$BASE_IMAGE" ]; then
   echo "start building base image: uniffle-base"
-  docker build -t "uniffle-base:latest" \
+  docker build --no-cache --pull -t "uniffle-base:latest" \
     -f base/"${OS_DISTRIBUTION}"/Dockerfile .
   BASE_IMAGE="uniffle-base:latest"
 else
