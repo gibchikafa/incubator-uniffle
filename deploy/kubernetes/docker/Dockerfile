@@ -1,6 +1,25 @@
 # syntax=docker/dockerfile:experimental
 
-ARG BASE_IMAGE=uniffle-base:latest
+# The base image is a stage of this file rather than a separately built image so a
+# single `docker buildx build` of this directory produces the rss image: the shared
+# Jenkins ImageBuilder builds and pushes with one command per registry and cannot see
+# images that only exist in the local daemon. --build-arg BASE_IMAGE=<ref> still
+# substitutes any image for the stage, as build.sh --base-image does.
+ARG JDK_IMAGE=eclipse-temurin:11-jdk
+ARG BASE_IMAGE=uniffle-base
+
+FROM ${JDK_IMAGE} AS uniffle-base
+
+# The packages below ship stale in the JDK image and are not refreshed by the
+# install of the tools on the next line.
+RUN apt-get update && \
+    apt-get install -y zlib1g zlib1g-dev lzop lsof netcat-openbsd dnsutils less procps iputils-ping curl && \
+    apt-get install -y --only-upgrade curl libcurl4t64 libgnutls30t64 linux-libc-dev \
+        util-linux mount login libuuid1 libsmartcols1 libmount1 libblkid1 bsdutils \
+        openssl openssl-provider-legacy libssl3t64 \
+        bind9-libs bind9-host bind9-dnsutils && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
 FROM ${BASE_IMAGE}
 
 ARG HADOOP_VERSION
